@@ -1,5 +1,7 @@
 package com.vom.microservices.currencyconversionservice;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +15,9 @@ import java.util.HashMap;
 @RestController
 public class CurrencyConversionController {
 
+    @Autowired
+    private Environment environment;
+
     @GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
     public CurrencyConversion calculateCurrencyConversion(@PathVariable String from,
                                                           @PathVariable String to,
@@ -24,6 +29,7 @@ public class CurrencyConversionController {
         ResponseEntity<CurrencyConversion> responseEntity = new RestTemplate().getForEntity
                 ("http://localhost:8000/currency-exchange/from/{from}/to/{to}",CurrencyConversion.class, uriVariables);
         CurrencyConversion currencyConversion = responseEntity.getBody();
+        currencyConversion.setEnvironment(environment.getProperty("local.server.port"));
         return currencyConversion;
     }
 }
